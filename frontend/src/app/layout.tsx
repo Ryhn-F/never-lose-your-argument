@@ -1,11 +1,20 @@
 import React from "react";
-import { Inter } from "next/font/google";
-import { Navigation, Footer } from "@/components/layout";
-import "./globals.css";
+import { type Metadata } from 'next'
+import { ClerkProvider } from '@clerk/nextjs'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
+import './globals.css'
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
 
-export const metadata = {
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
+export const metadata: Metadata = {
   title: "Penganalisis Kesalahan Logika",
   description:
     "Aplikasi untuk menganalisis logical fallacies dalam teks dengan bantuan AI",
@@ -13,18 +22,20 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="id">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50 dark:bg-neutral-950">
-          <Navigation />
-          {children}
-          <Footer />
-        </div>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="id">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <div className="min-h-screen bg-gray-50 dark:bg-neutral-950">
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
