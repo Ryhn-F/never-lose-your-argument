@@ -107,12 +107,6 @@ temp/
 # Docker
 .dockerignore
 
-# SSL certificates
-*.pem
-*.crt
-*.key
-ssl/
-
 # Database
 *.db
 *.sqlite
