@@ -1,0 +1,262 @@
+name: Health Check & Docker Compose Validation
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  docker-compose-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check required secrets
+      run: |
+        if [ -z "${{ secrets.GOOGLE_API_KEY }}" ]; then
+          echo "❌ GOOGLE_API_KEY secret is not set"
+          echo "Please add GOOGLE_API_KEY to repository secrets"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.SECRET_KEY }}" ]; then
+          echo "❌ SECRET_KEY secret is not set"
+          echo "Please add SECRET_KEY to repository secrets"
+          echo "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+          exit 1
+        fi
+        
+        echo "✅ All required secrets are available"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Create environment files
+      run: |
+        # Create backend .env file
+        cat > backend/.env << EOF
+        SECRET_KEY=${{ secrets.SECRET_KEY }}
+        FLASK_ENV=production
+        FLASK_DEBUG=false
+        PORT=5000
+        GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+        LLM_MODEL=gemini-2.0-flash
+        LLM_PROVIDER=google_genai
+        API_RATE_LIMIT=100 per minute
+        CORS_ORIGINS=http://localhost:3000,https://localhost
+        EOF
+        
+        # Create frontend .env file
+        cat > frontend/.env << EOF
+        NEXT_PUBLIC_BACKEND_URL=http://backend:5000/api/v1
+        EOF
+
+    - name: Validate docker-compose.yml syntax
+      run: |
+        docker-compose -f docker-compose.yml config
+
+    - name: Validate docker-compose.prod.yml syntax
+      run: |
+        docker-compose -f docker-compose.prod.yml config
+
+    - name: Build and start services
+      run: |
+        docker-compose up -d --build
+        
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for services to start..."
+        sleep 60
+
+    - name: Check backend health
+      run: |
+        max_attempts=30
+        attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt: Checking backend health..."
+          
+          if curl -f http://localhost:5000/api/v1/health; then
+            echo "Backend is healthy!"
+            break
+          fi
+          
+          if [ $attempt -eq $max_attempts ]; then
+            echo "Backend health check failed after $max_attempts attempts"
+            docker-compose logs backend
+            exit 1
+          fi
+          
+          echo "Backend not ready yet, waiting 10 seconds..."
+          sleep 10
+          attempt=$((attempt + 1))
+        done
+
+    - name: Check frontend health
+      run: |
+        max_attempts=30
+        attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt: Checking frontend health..."
+          
+          if curl -f http://localhost:3000; then
+            echo "Frontend is healthy!"
+            break
+          fi
+          
+          if [ $attempt -eq $max_attempts ]; then
+            echo "Frontend health check failed after $max_attempts attempts"
+            docker-compose logs frontend
+            exit 1
+          fi
+          
+          echo "Frontend not ready yet, waiting 10 seconds..."
+          sleep 10
+          attempt=$((attempt + 1))
+        done
+
+    - name: Check Docker container status
+      run: |
+        echo "=== Container Status ==="
+        docker-compose ps
+        
+        echo "=== Container Health ==="
+        docker inspect --format='{{.Name}}: {{.State.Health.Status}}' $(docker-compose ps -q) || true
+
+    - name: Test API endpoints
+      run: |
+        echo "Testing API endpoints..."
+        
+        # Test health endpoint
+        curl -f http://localhost:5000/api/v1/health
+        
+        # Test if frontend serves content
+        curl -f http://localhost:3000 | head -20
+
+    - name: Show logs on failure
+      if: failure()
+      run: |
+        echo "=== Backend Logs ==="
+        docker-compose logs backend
+        
+        echo "=== Frontend Logs ==="
+        docker-compose logs frontend
+        
+        echo "=== Container Status ==="
+        docker-compose ps
+
+    - name: Cleanup
+      if: always()
+      run: |
+        docker-compose down -v
+        docker system prune -f
+
+  production-compose-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check required secrets
+      run: |
+        if [ -z "${{ secrets.GOOGLE_API_KEY }}" ]; then
+          echo "❌ GOOGLE_API_KEY secret is not set"
+          echo "Please add GOOGLE_API_KEY to repository secrets"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.SECRET_KEY }}" ]; then
+          echo "❌ SECRET_KEY secret is not set"
+          echo "Please add SECRET_KEY to repository secrets"
+          echo "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+          exit 1
+        fi
+        
+        echo "✅ All required secrets are available"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Create environment files
+      run: |
+        # Create backend .env file
+        cat > backend/.env << EOF
+        SECRET_KEY=${{ secrets.SECRET_KEY }}
+        FLASK_ENV=production
+        FLASK_DEBUG=false
+        PORT=5000
+        GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+        LLM_MODEL=gemini-2.0-flash
+        LLM_PROVIDER=google_genai
+        API_RATE_LIMIT=100 per minute
+        CORS_ORIGINS=http://localhost:3000,https://localhost
+        EOF
+        
+        # Create frontend .env file
+        cat > frontend/.env << EOF
+        NEXT_PUBLIC_BACKEND_URL=http://backend:5000/api/v1
+        EOF
+        
+        # Create SSL certificates for nginx
+        mkdir -p nginx/ssl
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+          -keyout nginx/ssl/selfsigned.key \
+          -out nginx/ssl/selfsigned.crt \
+          -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+
+    - name: Validate production docker-compose syntax
+      run: |
+        docker-compose -f docker-compose.prod.yml config
+
+    - name: Build production services
+      run: |
+        docker-compose -f docker-compose.prod.yml up -d --build
+
+    - name: Wait for production services
+      run: |
+        echo "Waiting for production services to start..."
+        sleep 90
+
+    - name: Check production services health
+      run: |
+        echo "=== Production Container Status ==="
+        docker-compose -f docker-compose.prod.yml ps
+        
+        # Check backend through nginx (HTTPS)
+        max_attempts=20
+        attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt: Checking production backend through nginx..."
+          
+          if curl -k -f https://localhost/api/v1/health; then
+            echo "Production backend is healthy through nginx!"
+            break
+          fi
+          
+          if [ $attempt -eq $max_attempts ]; then
+            echo "Production backend health check failed"
+            docker-compose -f docker-compose.prod.yml logs
+            exit 1
+          fi
+          
+          sleep 15
+          attempt=$((attempt + 1))
+        done
+
+    - name: Show production logs on failure
+      if: failure()
+      run: |
+        echo "=== Production Logs ==="
+        docker-compose -f docker-compose.prod.yml logs
+
+    - name: Cleanup production
+      if: always()
+      run: |
+        docker-compose -f docker-compose.prod.yml down -v
+        docker system prune -f

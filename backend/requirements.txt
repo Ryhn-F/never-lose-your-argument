@@ -1,0 +1,25 @@
+# Flask and web framework
+Flask
+Flask-CORS
+
+# AI/ML and LangChain
+langchain
+langchain-core
+langchain-community
+langchain-google-genai
+google-generativeai
+
+# Data validation and serialization
+pydantic
+marshmallow
+# Environment and configuration
+python-dotenv
+# HTTP requests
+requests==2.31.0
+
+# Production server
+gunicorn==21.2.0
+
+# Development and testing
+black 
+flake8
