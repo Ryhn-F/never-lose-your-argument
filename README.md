@@ -1,17 +1,29 @@
-# Check Your Statement
+# Never Lose Argument - Fallacy Checker
 
-Aplikasi untuk memeriksa logical fallacy dalam sebuah pernyataan.
+Aplikasi web yang menggunakan AI untuk menganalisis teks dan mengidentifikasi logical fallacies (kesalahan logika) dengan arsitektur yang bersih dan terstruktur.
 
-## Deskripsi
+## 🎯 Fitur Utama
 
-Check Your Statement adalah aplikasi yang membantu pengguna mengidentifikasi logical fallacy (kesalahan logika) dalam teks atau pernyataan. Aplikasi ini terdiri dari frontend (Next.js) dan backend (Flask) yang menggunakan AI untuk menganalisis teks.
+- **Analisis Teks**: Menganalisis teks untuk mengidentifikasi kesalahan logika menggunakan Google Gemini AI
+- **Deteksi Sentimen**: Menentukan sentimen dari teks yang dianalisis  
+- **Tingkat Kekuatan & Agresivitas**: Mengukur tingkat kekuatan dan agresivitas argumen
+- **Interface Responsif**: Desain yang responsif dan mendukung dark mode
+- **Informasi Fallacy**: Halaman informasi tentang berbagai jenis logical fallacy
 
-## Persyaratan Sistem
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Flask (Python), LangChain, Google Gemini AI
+- **Infrastructure**: Docker, Nginx, GitHub Actions
+- **Architecture**: Clean Architecture dengan separation of concerns
+
+## 📋 Persyaratan Sistem
 
 ### Untuk Pengembangan Lokal
-- Node.js (versi 16.0.0 atau lebih baru)
+- Node.js (versi 18.0.0 atau lebih baru)
 - Python (versi 3.11 atau lebih baru)
 - npm atau yarn
+- Google AI Studio API Key
 - Docker dan Docker Compose (opsional)
 
 ## Cara Menjalankan Aplikasi
@@ -148,15 +160,27 @@ Check Your Statement adalah aplikasi yang membantu pengguna mengidentifikasi log
   ```
 
 
-## Struktur Proyek
+## 🏗️ Struktur Proyek
 
 ```
-.
-├── backend/             # Aplikasi backend Flask
-├── frontend/           # Aplikasi frontend Next.js
-├── k8/                 # Manifest Kubernetes
-├── terraform/          # Konfigurasi infrastruktur Terraform
-└── docker-compose.yml  # Konfigurasi Docker Compose
+never-lose-argument/
+├── backend/                 # 🐍 Backend API (Flask + Google Gemini AI)
+│   ├── app/                # Core application logic
+│   ├── tests/              # Unit tests
+│   ├── docs/               # Backend documentation
+│   └── requirements.txt    # Python dependencies
+├── frontend/               # ⚛️ Frontend App (Next.js + React)
+│   ├── src/               # Source code
+│   │   ├── app/           # Next.js App Router pages
+│   │   ├── components/    # Reusable UI components
+│   │   ├── features/      # Feature-based modules
+│   │   └── services/      # API integration
+│   ├── docs/              # Frontend documentation
+│   └── package.json       # Node.js dependencies
+├── nginx/                  # 🌐 Reverse proxy configuration
+├── .github/               # 🔄 CI/CD workflows
+├── docker-compose.yml     # 🐳 Development environment
+└── docker-compose.prod.yml # 🚀 Production environment
 ```
 
 ## CI/CD dan Quality Assurance
@@ -190,12 +214,30 @@ Sebelum workflow dapat berjalan, setup secrets yang diperlukan:
 
 Workflow ini memastikan bahwa setiap perubahan tidak merusak kemampuan aplikasi untuk berjalan dengan Docker Compose.
 
-## Kontribusi
+## 📚 Dokumentasi Lengkap
+
+- **[Frontend Documentation](./frontend/docs/index.md)** - Complete frontend documentation
+- **[Backend Documentation](./backend/docs/api.md)** - API reference and backend guide
+- **[Architecture Guide](./backend/ARCHITECTURE.md)** - System architecture overview
+- **[Deployment Guide](./frontend/docs/DEPLOYMENT.md)** - Production deployment guide
+
+## 🤝 Kontribusi
 
 1. Fork repository ini
-2. Buat branch fitur (`git checkout -b fitur/namafitur`)
-3. Commit perubahan (`git commit -m 'Menambahkan fitur'`)
-4. Push ke branch (`git push origin fitur/namafitur`)
+2. Buat branch fitur (`git checkout -b feature/amazing-feature`)
+3. Commit perubahan (`git commit -m 'Add amazing feature'`)
+4. Push ke branch (`git push origin feature/amazing-feature`)
 5. Buat Pull Request
 
 **Catatan**: Pastikan semua GitHub Actions workflow berhasil sebelum merge PR.
+
+## 📄 License
+
+MIT License - lihat file LICENSE untuk detail lengkap.
+
+## 🙏 Acknowledgments
+
+- **Google Gemini AI** untuk model bahasa yang powerful
+- **Next.js & React** untuk frontend framework yang modern
+- **Flask & LangChain** untuk backend yang efisien
+- **Tailwind CSS** untuk styling yang responsif
