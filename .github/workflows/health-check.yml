@@ -54,6 +54,17 @@ jobs:
         NEXT_PUBLIC_BACKEND_URL=http://backend:5000/api/v1
         EOF
 
+    - name: Verify project structure
+      run: |
+        echo "=== Project structure ==="
+        ls -la
+        echo "=== Frontend structure ==="
+        ls -la frontend/
+        echo "=== Frontend public folder ==="
+        ls -la frontend/public/ || echo "Public folder not found"
+        echo "=== Frontend package.json ==="
+        cat frontend/package.json
+
     - name: Validate docker-compose.yml syntax
       run: |
         docker compose -f docker-compose.yml config
@@ -64,7 +75,8 @@ jobs:
 
     - name: Build and start services
       run: |
-        docker compose up -d --build
+        echo "=== Building services with verbose output ==="
+        docker compose up -d --build --progress=plain
         
     - name: Wait for services to be ready
       run: |
@@ -209,13 +221,23 @@ jobs:
           -out nginx/ssl/selfsigned.crt \
           -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
+    - name: Verify production project structure
+      run: |
+        echo "=== Production project structure ==="
+        ls -la
+        echo "=== Frontend structure ==="
+        ls -la frontend/
+        echo "=== Frontend public folder ==="
+        ls -la frontend/public/ || echo "Public folder not found"
+
     - name: Validate production docker-compose syntax
       run: |
         docker compose -f docker-compose.prod.yml config
 
     - name: Build production services
       run: |
-        docker compose -f docker-compose.prod.yml up -d --build
+        echo "=== Building production services with verbose output ==="
+        docker compose -f docker-compose.prod.yml up -d --build --progress=plain
 
     - name: Wait for production services
       run: |
