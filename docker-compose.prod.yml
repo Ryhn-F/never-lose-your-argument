@@ -16,28 +16,6 @@ services:
       retries: 3
       start_period: 40s
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_BACKEND_URL=http://localhost:5000/api/v1
-    container_name: check-statement-frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:5000/api/v1
-    depends_on:
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   nginx:
     build: ./nginx
     ports:
@@ -47,7 +25,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
-      - frontend
       - backend
     restart: unless-stopped
 
