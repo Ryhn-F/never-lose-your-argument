@@ -75,8 +75,7 @@ jobs:
 
     - name: Build and start services
       run: |
-        echo "=== Building services with verbose output ==="
-        docker compose up -d --build --progress=plain
+        docker compose up -d --build 
         
     - name: Wait for services to be ready
       run: |
@@ -236,8 +235,7 @@ jobs:
 
     - name: Build production services
       run: |
-        echo "=== Building production services with verbose output ==="
-        docker compose -f docker-compose.prod.yml up -d --build --progress=plain
+        docker compose -f docker-compose.prod.yml up -d --build
 
     - name: Wait for production services
       run: |
