@@ -56,15 +56,15 @@ jobs:
 
     - name: Validate docker-compose.yml syntax
       run: |
-        docker-compose -f docker-compose.yml config
+        docker compose -f docker-compose.yml config
 
     - name: Validate docker-compose.prod.yml syntax
       run: |
-        docker-compose -f docker-compose.prod.yml config
+        docker compose -f docker-compose.prod.yml config
 
     - name: Build and start services
       run: |
-        docker-compose up -d --build
+        docker compose up -d --build
         
     - name: Wait for services to be ready
       run: |
@@ -122,10 +122,10 @@ jobs:
     - name: Check Docker container status
       run: |
         echo "=== Container Status ==="
-        docker-compose ps
+        docker compose ps
         
         echo "=== Container Health ==="
-        docker inspect --format='{{.Name}}: {{.State.Health.Status}}' $(docker-compose ps -q) || true
+        docker inspect --format='{{.Name}}: {{.State.Health.Status}}' $(docker compose ps -q) || true
 
     - name: Test API endpoints
       run: |
@@ -141,18 +141,18 @@ jobs:
       if: failure()
       run: |
         echo "=== Backend Logs ==="
-        docker-compose logs backend
+        docker compose logs backend
         
         echo "=== Frontend Logs ==="
-        docker-compose logs frontend
+        docker compose logs frontend
         
         echo "=== Container Status ==="
-        docker-compose ps
+        docker compose ps
 
     - name: Cleanup
       if: always()
       run: |
-        docker-compose down -v
+        docker compose down -v
         docker system prune -f
 
   production-compose-check:
@@ -211,11 +211,11 @@ jobs:
 
     - name: Validate production docker-compose syntax
       run: |
-        docker-compose -f docker-compose.prod.yml config
+        docker compose -f docker-compose.prod.yml config
 
     - name: Build production services
       run: |
-        docker-compose -f docker-compose.prod.yml up -d --build
+        docker compose -f docker-compose.prod.yml up -d --build
 
     - name: Wait for production services
       run: |
@@ -225,7 +225,7 @@ jobs:
     - name: Check production services health
       run: |
         echo "=== Production Container Status ==="
-        docker-compose -f docker-compose.prod.yml ps
+        docker compose -f docker-compose.prod.yml ps
         
         # Check backend through nginx (HTTPS)
         max_attempts=20
@@ -241,7 +241,7 @@ jobs:
           
           if [ $attempt -eq $max_attempts ]; then
             echo "Production backend health check failed"
-            docker-compose -f docker-compose.prod.yml logs
+            docker compose -f docker-compose.prod.yml logs
             exit 1
           fi
           
@@ -253,10 +253,10 @@ jobs:
       if: failure()
       run: |
         echo "=== Production Logs ==="
-        docker-compose -f docker-compose.prod.yml logs
+        docker compose -f docker-compose.prod.yml logs
 
     - name: Cleanup production
       if: always()
       run: |
-        docker-compose -f docker-compose.prod.yml down -v
+        docker compose -f docker-compose.prod.yml down -v
         docker system prune -f

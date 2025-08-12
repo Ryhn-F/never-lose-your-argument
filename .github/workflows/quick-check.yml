@@ -25,7 +25,7 @@ jobs:
     - name: Validate docker-compose.yml syntax
       run: |
         echo "Validating docker-compose.yml..."
-        docker-compose -f docker-compose.yml config --quiet
+        docker compose -f docker-compose.yml config --quiet
 
     - name: Validate docker-compose.prod.yml syntax
       run: |
