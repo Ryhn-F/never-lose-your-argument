@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 export const metadata: Metadata = {
-  title: "Penganalisis Kesalahan Logika",
+  title: "Dialectica - Never Lose an Argument Again",
   description:
-    "Aplikasi untuk menganalisis logical fallacies dalam teks dengan bantuan AI",
+    "Master the art of logical reasoning. Identify fallacies, strengthen your arguments, and engage in more meaningful discussions with AI-powered analysis.",
 };
 
 export default function RootLayout({
