@@ -12,7 +12,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ title, description }) => {
   return (
     <header className="mb-8 text-center">
-      <h1 className="text-3xl md:text-4xl font-bold mb-3 text-blue-600 dark:text-blue-400">
+      <h1 className="text-3xl font-bold tracking-tight">
         {title}
       </h1>
       {description && (

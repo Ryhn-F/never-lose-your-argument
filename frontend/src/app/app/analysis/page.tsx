@@ -28,7 +28,7 @@ export default function AnalysisPage() {
       <div className="max-w-4xl">
 
         <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">
+          <h2 className="text-3xl font-bold tracking-tight mb-2">
             Apa itu Logical Fallacy?
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">

@@ -21,7 +21,7 @@ export default function WelcomePage() {
           </div>
           
           <div className="flex gap-4">
-            <Button>
+            <Button variant="outline">
               <Link href="/app/analysis">
                 Start Analyzing
               </Link>

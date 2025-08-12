@@ -44,14 +44,14 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
           <p className="text-sm font-medium mb-2">Contoh teks:</p>
           <div className="flex flex-wrap gap-2">
             {EXAMPLE_TEXTS.map((contoh, index) => (
-              <button
+              <Button
                 key={index}
                 type="button"
                 onClick={() => handleExampleText(contoh)}
-                className="text-xs px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 rounded-full text-blue-800 dark:text-blue-300 transition-colors"
+                variant="outline"
               >
                 Contoh {index + 1}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -62,7 +62,7 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
           </div>
         )}
 
-        <Button type="submit" size="lg" disabled={isLoading} className="w-full">
+        <Button type="submit" size="lg" disabled={isLoading} className="w-full" variant="outline">
           {isLoading ? "Menganalisis..." : "Analisis Teks"}
         </Button>
       </form>
