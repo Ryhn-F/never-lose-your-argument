@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 export default function Home() {
-  const [showModal, setShowModal] = useState(false);
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
@@ -41,10 +40,10 @@ export default function Home() {
             
             <SignedIn>
               <button 
-                onClick={() => window.location.href = '/analysis'}
+                onClick={() => window.location.href = '/app'}
                 className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white font-semibold text-lg px-8 py-4 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
-                Start Analyzing
+                Go to Dashboard
               </button>
             </SignedIn>
           </div>

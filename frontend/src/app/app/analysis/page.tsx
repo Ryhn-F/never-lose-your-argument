@@ -1,20 +1,31 @@
-/**
- * About page component
- */
+"use client";
 
 import React from 'react';
+import { useAnalysis } from '@/hooks/useAnalysis';
 import { Header } from '@/components/layout';
+import { AnalysisForm, AnalysisResults } from '@/features/analysis/components';
 import { FallacyDescription } from '@/features/fallacy-info/components';
 import { FALLACY_TYPES } from '@/lib/constants/fallacies';
 
-export default function AboutPage() {
+export default function AnalysisPage() {
+  const { result, isLoading, error, analyzeText } = useAnalysis();
+
   return (
-    <main className="min-h-screen p-4 md:p-8 lg:p-12">
-      <div className="max-w-4xl mx-auto">
-        <Header
-          title="Tentang Fallacy Checker"
-          description="Pelajari lebih lanjut tentang logical fallacies dan cara kerja aplikasi ini"
-        />
+    <div className="flex-1 space-y-4">
+      <Header
+        title="Analysis Tool"
+        description="Identify logical fallacies in text with AI-powered analysis"
+      />
+
+      <AnalysisForm
+        onSubmit={analyzeText}
+        isLoading={isLoading}
+        error={error}
+      />
+
+      {result && <AnalysisResults result={result} />}
+
+      <div className="max-w-4xl">
 
         <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">
@@ -46,6 +57,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

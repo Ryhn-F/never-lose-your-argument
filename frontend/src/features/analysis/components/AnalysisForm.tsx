@@ -2,9 +2,9 @@
  * Analysis form component for text input and submission
  */
 
-import React, { useState } from 'react';
-import { Button, TextArea, Alert } from '@/components/ui';
-import { EXAMPLE_TEXTS } from '@/lib/constants/fallacies';
+import React, { useState } from "react";
+import { Button, TextArea, Alert } from "@/components/ui";
+import { EXAMPLE_TEXTS } from "@/lib/constants/fallacies";
 
 interface AnalysisFormProps {
   onSubmit: (text: string) => Promise<void>;
@@ -17,7 +17,7 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
   isLoading,
   error,
 }) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,13 +62,8 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
           </div>
         )}
 
-        <Button
-          type="submit"
-          size="lg"
-          isLoading={isLoading}
-          className="w-full"
-        >
-          Analisis Teks
+        <Button type="submit" size="lg" disabled={isLoading} className="w-full">
+          {isLoading ? "Menganalisis..." : "Analisis Teks"}
         </Button>
       </form>
     </div>
