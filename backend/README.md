@@ -117,9 +117,30 @@ python run.py
 
 ## 🔌 API Endpoints
 
-### `POST /api/v1/analysis/`
+### Authentication
 
-Menganalisis teks untuk mendeteksi logical fallacies.
+get JWT Template 
+```javascript
+await window.Clerk.session.getToken({ template: 'Fardhan' })
+```
+
+All API endpoints (except health checks) require authentication using Clerk JWT tokens. This backend now uses the **official Clerk Python SDK** for simplified and more reliable authentication.
+
+Include the token in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Key improvements in the new implementation:**
+- ✅ Uses official Clerk Python SDK
+- ✅ Simplified configuration (only requires `CLERK_SECRET_KEY`)
+- ✅ Better error handling and debugging
+- ✅ Automatic JWKS management
+
+### `POST /api/v1/analysis/` 🔒
+
+Menganalisis teks untuk mendeteksi logical fallacies. **Requires authentication.**
 
 **Request:**
 
@@ -146,9 +167,17 @@ Menganalisis teks untuk mendeteksi logical fallacies.
     }
   ],
   "processing_time": 2.34,
-  "model_used": "gemini-2.0-flash"
+  "model_used": "gemini-2.0-flash",
+  "user_id": "user_2abc123def"
 }
 ```
+
+### Authentication Endpoints
+
+- `GET /api/v1/auth/me` 🔒 - Get current user information
+- `GET /api/v1/auth/verify` 🔒 - Verify token validity
+- `GET /api/v1/auth/health` - Authentication service health check
+- `POST /api/v1/auth/debug-clerk` - Debug Clerk token verification (detailed error info)
 
 ### `GET /api/v1/health/`
 
@@ -172,15 +201,24 @@ pytest
 # Manual API testing
 python test_api.py
 
-# Test specific endpoint
+# Test authentication (new Clerk SDK)
+python scripts/test_clerk_auth.py
+
+# Migration checker
+python scripts/migrate_to_clerk_sdk.py
+
+# Test specific endpoint (requires valid JWT token)
 curl -X POST http://localhost:5000/api/v1/analysis/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"text": "Test text here"}'
 ```
 
 ## 📚 Documentation
 
 - **[API Documentation](docs/api.md)** - Complete API reference
+- **[Authentication Guide](docs/authentication.md)** - Clerk authentication setup
+- **[CORS Troubleshooting](docs/troubleshooting-cors.md)** - Fix CORS and connection issues
 - **[Development Guide](docs/development.md)** - Setup and development
 - **[Deployment Guide](docs/deployment.md)** - Production deployment
 - **[Integration Guide](docs/integration.md)** - Frontend integration
@@ -191,11 +229,19 @@ curl -X POST http://localhost:5000/api/v1/analysis/ \
 Backend ini dirancang untuk bekerja dengan frontend NextJS + Clerk:
 
 ```typescript
-// Frontend example
+// Frontend example with Clerk authentication
+import { useAuth } from '@clerk/nextjs';
+
 const analyzeText = async (text: string) => {
+  const { getToken } = useAuth();
+  const token = await getToken();
+  
   const response = await fetch("http://localhost:5000/api/v1/analysis/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
     body: JSON.stringify({ text }),
   });
   return response.json();
@@ -216,11 +262,13 @@ Lihat [docs/deployment.md](docs/deployment.md) untuk panduan detail.
 
 ## 🔧 Configuration
 
-| Variable         | Description       | Required | Default                 |
-| ---------------- | ----------------- | -------- | ----------------------- |
-| `GOOGLE_API_KEY` | Google AI API key | ✅ Yes   | -                       |
-| `CORS_ORIGINS`   | Allowed origins   | ❌ No    | `http://localhost:3000` |
-| `API_RATE_LIMIT` | Rate limit        | ❌ No    | `100 per minute`        |
+| Variable                | Description              | Required | Default                 |
+| ----------------------- | ------------------------ | -------- | ----------------------- |
+| `GOOGLE_API_KEY`        | Google AI API key        | ✅ Yes   | -                       |
+| `CLERK_PUBLISHABLE_KEY` | Clerk publishable key    | ❌ No    | -                       |
+| `CLERK_SECRET_KEY`      | Clerk secret key         | ✅ Yes   | -                       |
+| `CORS_ORIGINS`          | Allowed origins          | ❌ No    | `http://localhost:3000` |
+| `API_RATE_LIMIT`        | Rate limit               | ❌ No    | `100 per minute`        |
 
 ## 🤖 AI Model
 

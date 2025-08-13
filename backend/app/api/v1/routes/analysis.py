@@ -1,8 +1,9 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from app.core.middleware import rate_limit
 from app.core.exceptions import ValidationError
 from app.services.llm_service import LLMService
 from app.api.v1.schemas.analysis import AnalysisRequestSchema
+from app.utils.auth import require_auth
 
 analysis_bp = Blueprint("analysis", __name__)
 llm_service = LLMService()
@@ -10,6 +11,7 @@ llm_service = LLMService()
 
 @analysis_bp.route("/", methods=["POST", "OPTIONS"])
 @rate_limit("10 per minute")
+@require_auth
 def analyze_text():
     """
     Analyze text for logical fallacies
@@ -55,6 +57,9 @@ def analyze_text():
 
         # Convert Pydantic model to dictionary
         result_dict = result.model_dump()
+        
+        # Add user context to response (optional)
+        result_dict["user_id"] = g.user_id
 
         return jsonify(result_dict), 200
 

@@ -17,6 +17,9 @@ python-dotenv
 # HTTP requests
 requests==2.31.0
 
+# Clerk authentication
+clerk-backend-api
+
 # Production server
 gunicorn==21.2.0
 

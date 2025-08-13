@@ -20,10 +20,14 @@ class Config:
     API_RATE_LIMIT = os.environ.get("API_RATE_LIMIT", "100 per minute")
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
 
+    # Clerk Authentication
+    CLERK_PUBLISHABLE_KEY = os.environ.get("CLERK_PUBLISHABLE_KEY")
+    CLERK_SECRET_KEY = os.environ.get("CLERK_SECRET_KEY")
+
     @classmethod
     def validate_config(cls):
         """Validate required configuration"""
-        required_vars = ["GOOGLE_API_KEY"]
+        required_vars = ["GOOGLE_API_KEY", "CLERK_SECRET_KEY"]
 
         missing_vars = []
         for var in required_vars:

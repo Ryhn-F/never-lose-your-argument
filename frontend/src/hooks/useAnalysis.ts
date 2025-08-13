@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { AnalysisResult } from '@/lib/types/analysis';
-import { analysisService } from '@/services/analysis.service';
+import { useAnalysisApi } from './useAnalysisApi';
 
 interface UseAnalysisState {
   result: AnalysisResult | null;
@@ -19,26 +19,27 @@ interface UseAnalysisActions {
 }
 
 export const useAnalysis = (): UseAnalysisState & UseAnalysisActions => {
-  const [state, setState] = useState<UseAnalysisState>({
+  const { analyzeText: apiAnalyzeText, isLoading: apiLoading } = useAnalysisApi();
+  const [state, setState] = useState<{
+    result: AnalysisResult | null;
+    error: string;
+  }>({
     result: null,
-    isLoading: false,
     error: '',
   });
 
   const analyzeText = useCallback(async (text: string) => {
     setState(prev => ({
       ...prev,
-      isLoading: true,
       error: '',
     }));
 
     try {
-      const response = await analysisService.analyzeText(text);
+      const response = await apiAnalyzeText(text);
       
       if (response.error) {
         setState(prev => ({
           ...prev,
-          isLoading: false,
           error: response.error!,
         }));
         return;
@@ -46,18 +47,16 @@ export const useAnalysis = (): UseAnalysisState & UseAnalysisActions => {
 
       setState(prev => ({
         ...prev,
-        isLoading: false,
         result: response.data!,
       }));
 
     } catch {
       setState(prev => ({
         ...prev,
-        isLoading: false,
         error: 'Terjadi kesalahan saat menganalisis teks. Silakan coba lagi.',
       }));
     }
-  }, []);
+  }, [apiAnalyzeText]);
 
   const clearResult = useCallback(() => {
     setState(prev => ({
@@ -74,7 +73,9 @@ export const useAnalysis = (): UseAnalysisState & UseAnalysisActions => {
   }, []);
 
   return {
-    ...state,
+    result: state.result,
+    isLoading: apiLoading,
+    error: state.error,
     analyzeText,
     clearResult,
     clearError,

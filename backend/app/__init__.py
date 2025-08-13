@@ -18,8 +18,9 @@ def create_app(config_class=Config):
     CORS(app, 
          origins=cors_origins,
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-         allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
-         supports_credentials=True)
+         allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+         supports_credentials=True,
+         max_age=86400)  # Cache preflight for 24 hours
 
     # Setup middleware
     setup_middleware(app)
