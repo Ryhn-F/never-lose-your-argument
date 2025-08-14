@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Bot } from "lucide-react"
-import Link from "next/link"
-
+import { Button } from "@/components/ui";
+import { Bot } from "lucide-react";
+import Link from "next/link";
 
 export default function WelcomePage() {
   return (
@@ -16,19 +15,18 @@ export default function WelcomePage() {
               Welcome to Dialectica
             </h1>
             <p className="text-lg text-muted-foreground">
-              Master the art of logical reasoning and never lose an argument again.
+              Master the art of logical reasoning and never lose an argument
+              again.
             </p>
           </div>
-          
+
           <div className="flex gap-4">
             <Button variant="outline">
-              <Link href="/app/analysis">
-                Start Analyzing
-              </Link>
+              <Link href="/app/analysis">Start Analyzing</Link>
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
